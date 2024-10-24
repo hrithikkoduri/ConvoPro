@@ -1,5 +1,5 @@
 venv/
 .env
-_pycache_/
+__pycache__/
 ngrok_recovery_codes.txt
 example_knowledge_base.txt
