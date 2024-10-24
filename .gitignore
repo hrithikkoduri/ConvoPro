@@ -1,0 +1,5 @@
+venv/
+.env
+_pycache_/
+ngrok_recovery_codes.txt
+example_knowledge_base.txt
