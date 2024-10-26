@@ -14,7 +14,7 @@ from langchain_core.messages import HumanMessage, AIMessage
 
 
 load_dotenv()
-CALENDLY_LINK = os.getenv('CALENDLY_LINK', 'https://calendly.com/your-link')
+CALENDLY_LINK = os.getenv('CALENDLY_LINK', 'https://calendly.com/hrithikkoduri18/30min')
 openai_api_key = os.getenv("OPENAI_API_KEY")
 
 class Output:
