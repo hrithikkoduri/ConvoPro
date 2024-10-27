@@ -10,11 +10,12 @@ from langchain.chains import (
     create_retrieval_chain,
 )
 from langchain_core.messages import HumanMessage, AIMessage
+from datetime import date
 
 
 
 load_dotenv()
-CALENDLY_LINK = os.getenv('CALENDLY_LINK', 'https://calendly.com/hrithikkoduri18/30min')
+
 openai_api_key = os.getenv("OPENAI_API_KEY")
 
 class Output:
@@ -37,7 +38,9 @@ class Output:
 
 
         self.system_message = '''   
-            You are an AI customer service assistant designed to help users understand and interact with our company’s services and products. Your primary role is to answer questions based on the information extracted from our knowledge base, which includes policies, product details, and customer support procedures.
+            You are a Donna and  AI receptionist for BasePower which is a electricity and battery provider,your to help users understand and interact with our company’s services and products. Your primary role is to answer questions based on the information extracted from our knowledge base, which includes policies, product details, and customer support procedures.
+
+            On the contrary, if user wants to schedule a meeting, just ask for user's name, availability date and time and any any reason/requirement/description for the appointment. And kindly reply that their meeting has been scheduled.
 
             For the context of the conversation, you can use this {context}.
 
@@ -59,14 +62,17 @@ class Output:
             - Focus solely on the information available in the knowledge base context.
             - If a question is anything not relevant simply ask questions relevant to the company.
             - Use simple language to ensure clarity, avoiding technical jargon unless necessary.
+
+            Again, if user wants to schedule a meeting, just ask for user's name, availability date and time and any reason/requirement/description for the appointment. And kindly reply that their meeting has been scheduled.
         
         '''
 
         self.prompt_get_answer = ChatPromptTemplate.from_messages([
             ("system", self.system_message),
             MessagesPlaceholder(variable_name="chat_history"),
-            ("user", "{input}"),
-            ("user", "Given the above conversation, generate an answer to the user's question.")
+            ("user", "User{input}"),
+            ("user", "Given the above conversation, generate an answer to the user's question."),
+            
         ])
 
         self. document_chain= create_stuff_documents_chain(self.llm, self.prompt_get_answer)
@@ -89,6 +95,8 @@ class Output:
         print("-------------------")
         print( "Context:",response['context'])
         print("-------------------")
+
+        
         self.chat_history.append(HumanMessage(question))
         self.chat_history.append(AIMessage(response['answer']))
 
@@ -105,28 +113,6 @@ class Output:
         self.chat_history = self.chat_history[-6:]
         print("-------------------")
         print("Chat History after broadcast message:",self.chat_history)
-
-    def schedule_meeting(self):
-
-        response = f"You can schedule a meeting with me using this link: {CALENDLY_LINK}\n\nPlease select a time that works best for you."
-        self.update_chat_history(response)
-
-        return response
-
-
-def main():
-    output = Output()
-    question = "What kind of benefits do you offer?"
-    response = output.chat(question)
-    print("Response:",response['response'])
-    print("Chat History:",response['chat_history'])
-
-    print("-------------------")
-    question = "How do I go about the installation process?"
-    response = output.chat(question)
-    print("Response:",response['response'])
-    print("Chat History:",response['chat_history'])
-
     
 
 if __name__ == "__main__":

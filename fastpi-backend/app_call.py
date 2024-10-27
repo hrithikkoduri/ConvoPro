@@ -12,6 +12,7 @@ from fastapi.websockets import WebSocketDisconnect
 from twilio.twiml.voice_response import VoiceResponse, Connect, Say, Stream
 from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
+from appointment_call import AppointmentWorkflow
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -20,9 +21,10 @@ logger = logging.getLogger(__name__)
 # Configuration
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')  # requires OpenAI Realtime API Access
 PORT = int(os.getenv('PORT', 5050))
+appointment_workflow = AppointmentWorkflow()
 
 
-SYSTEM_MESSAGE = """You are Donna and  AI receptionist for Barts Automotive. Your job is to politely engage with the client and 
+SYSTEM_MESSAGE = """You are Donna and  AI receptionist for BasePower which is a electricity and battery provider. Your job is to politely engage with the client and 
 obtain their name, availability, and service/work required. Ask one question at a time. Do not ask for other contact 
 information, and do not check availability, assume we are free. Ensure the conversation remains friendly and professional, 
 and guide the user to provide these details naturally. If necessary, ask follow-up questions to gather the required information."""
@@ -236,6 +238,7 @@ async def media_stream(websocket: WebSocket):
         # Optional: Send transcript to webhook
         # You could add webhook functionality here to send the transcript
         # to your external system
+        result = appointment_workflow.process_transcript_and_send_to_webhook(session["transcript"])
 
 if __name__ == "__main__":
     import uvicorn
