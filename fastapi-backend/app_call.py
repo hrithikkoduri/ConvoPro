@@ -28,6 +28,7 @@ SYSTEM_MESSAGE = """You are Donna and  AI receptionist for BasePower which is a 
 obtain their name, availability, and service/work required. Ask one question at a time. Do not ask for other contact 
 information, and do not check availability, assume we are free. Ensure the conversation remains friendly and professional, 
 and guide the user to provide these details naturally. If necessary, ask follow-up questions to gather the required information."""
+
 VOICE = "alloy"
 
 LOG_EVENT_TYPES = [
@@ -72,7 +73,7 @@ async def incoming_call(request: Request):
 
     host = request.url.hostname
     connect = Connect()
-    connect.stream(url=f'wss://{host}/media-stream')
+    connect.stream(url=f'wss://{host}/call/media-stream')
     response.append(connect)
 
     return HTMLResponse(content=str(response), media_type="application/xml")
