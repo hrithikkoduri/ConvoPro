@@ -13,6 +13,7 @@ from twilio.twiml.voice_response import VoiceResponse, Connect, Say, Stream
 from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
 from appointment_call import AppointmentWorkflow
+from storage import CompanyDetailsStorage, Details
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -23,11 +24,27 @@ OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')  # requires OpenAI Realtime API Acc
 PORT = int(os.getenv('PORT', 5050))
 appointment_workflow = AppointmentWorkflow()
 
+storage = CompanyDetailsStorage()
 
-SYSTEM_MESSAGE = """You are Donna and  AI receptionist for BasePower which is a electricity and battery provider. Your job is to politely engage with the client and 
-obtain their name, availability, and service/work required. Ask one question at a time. Do not ask for other contact 
-information, and do not check availability, assume we are free. Ensure the conversation remains friendly and professional, 
-and guide the user to provide these details naturally. If necessary, ask follow-up questions to gather the required information."""
+company_details = storage.load_details()
+
+print("--------#########--------")
+print(f"Company Name: {company_details.company_name}")
+print(f"Services: {company_details.services}")
+print("--------#########--------")
+
+
+SYSTEM_MESSAGE = f"""You are Donna, an AI receptionist for the company: {company_details.company_name}, which provides services: {company_details.services}.
+        Here is a short description of the company: {company_details.short_description} and some context: {company_details.summary}.
+        Your job is to:
+        - Politely engage with the client and answer their questions regarding the company and services.
+        - If they want to book an appointment, obtain their name, availability, and service/work required. Ask one question at a time.
+        Do not ask for other contact information, and do not check availability, assume we are free. Ensure the conversation remains friendly and professional, 
+        and guide the user to provide these details naturally. If necessary, ask follow-up questions to gather the required information."""
+
+print("--------#########--------")
+print(SYSTEM_MESSAGE)
+print("--------#########--------")
 
 VOICE = "alloy"
 

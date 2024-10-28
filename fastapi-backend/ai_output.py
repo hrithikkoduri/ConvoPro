@@ -11,12 +11,15 @@ from langchain.chains import (
 )
 from langchain_core.messages import HumanMessage, AIMessage
 from datetime import date
+from storage import CompanyDetailsStorage, Details
 
 
 
 load_dotenv()
 
 openai_api_key = os.getenv("OPENAI_API_KEY")
+
+
 
 class Output:
     def __init__(self, db):
@@ -38,10 +41,12 @@ class Output:
 
 
         self.system_message = '''   
-            You are a Donna and  AI receptionist for BasePower which is a electricity and battery provider,your to help users understand and interact with our company’s services and products. Your primary role is to answer questions based on the information extracted from our knowledge base, which includes policies, product details, and customer support procedures.
-
-            On the contrary, if user wants to schedule a meeting, just ask for user's name, availability date and time and any any reason/requirement/description for the appointment. And kindly reply that their meeting has been scheduled.
-
+            You are a Donna and  AI receptionist for the company: {company} which provides services {services}/
+            Here is the short description of the company: {short_description}.
+            Your to help users understand and interact with our company’s services and products. Your primary role is to answer questions based on the information extracted from our knowledge base, which includes policies, product details, and customer support procedures.
+            \n
+            On the contrary, if user wants to schedule a meeting, just ask for user's name, availability date, availability time and any any reason/requirement/description for the appointment. Make sure to ask one question at a time. Once they have provided all details kindly reply that their meeting has been scheduled.
+            \n
             For the context of the conversation, you can use this {context}.
 
             If no question is asked, offer a brief overview of our company’s services and suggest possible questions related to our offerings, support, and general inquiries. If you don't know the answer, ask the user to be more specific. If the question is not related to our services, request a relevant question.
@@ -54,6 +59,7 @@ class Output:
             - Provide relevant details, policies, and procedures as needed.
             - Offer guidance on navigating our services and accessing support.
             - Assist with common inquiries about service offerings, account management, and procedures.
+            - Keep the answers concise and informative, avoiding unnecessary details or jargon.
             
             Behavior Guidelines:
 
@@ -62,7 +68,8 @@ class Output:
             - Focus solely on the information available in the knowledge base context.
             - If a question is anything not relevant simply ask questions relevant to the company.
             - Use simple language to ensure clarity, avoiding technical jargon unless necessary.
-
+            - Keep the answers as concise as posible.
+            \n
             Again, if user wants to schedule a meeting, just ask for user's name, availability date and time and any reason/requirement/description for the appointment. And kindly reply that their meeting has been scheduled.
         
         '''
@@ -70,7 +77,7 @@ class Output:
         self.prompt_get_answer = ChatPromptTemplate.from_messages([
             ("system", self.system_message),
             MessagesPlaceholder(variable_name="chat_history"),
-            ("user", "User{input}"),
+            ("user", "User : {input}, company: {company}, services: {services}, short_description: {short_description}"),
             ("user", "Given the above conversation, generate an answer to the user's question."),
             
         ])
@@ -78,8 +85,6 @@ class Output:
         self. document_chain= create_stuff_documents_chain(self.llm, self.prompt_get_answer)
         self.retrieval_chain = create_retrieval_chain(self.retriever_chain, self.document_chain)
         
-
-
     #def chat(self, question, chat_history):
     def chat(self, question):
         
@@ -89,8 +94,16 @@ class Output:
         print("-------------------")
         print("Chat History inside function:",self.chat_history)
 
+
+        company_details = self.get_company_info()
+
+        company_name = company_details.company_name
+        short_description = company_details.short_description
+        services = company_details.services
+
+
         response = self.retrieval_chain.invoke(
-            {"input": question, "chat_history": self.chat_history}
+            {"input": question, "chat_history": self.chat_history, "company": company_name, "services": services, "short_description": short_description}
         )
         print("-------------------")
         print( "Context:",response['context'])
@@ -113,7 +126,24 @@ class Output:
         self.chat_history = self.chat_history[-6:]
         print("-------------------")
         print("Chat History after broadcast message:",self.chat_history)
+
+    def get_company_info(self):
+        storage = CompanyDetailsStorage()
+        try:
+            details = storage.load_details()
+            return details
+        except FileNotFoundError:
+            logger.error("Company details haven't been processed yet. Run the main script first.")
+            return None
+        except Exception as e:
+            logger.error(f"Error loading company details: {e}")
+            return None
     
 
 if __name__ == "__main__":
-    main()
+    
+    company_details = output.get_company_info()
+    if company_details:
+
+        print(f"Company Name: {company_details.company_name}")
+        print(f"Services: {company_details.services}")

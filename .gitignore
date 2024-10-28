@@ -2,6 +2,7 @@ venv/
 .env
 __pycache__/
 ngrok_recovery_codes.txt
-example_knowledge_base.txt
+company_details.json
 test.ipynb
 archive/
+test.py

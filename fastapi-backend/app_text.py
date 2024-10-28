@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request, Response
 from twilio.twiml.messaging_response import MessagingResponse
 from fastapi.middleware.cors import CORSMiddleware
 import logging
-from VectorStore import VectorStore
+from storage import VectorStore
 from ai_output import Output
 import os
 import uvicorn
@@ -26,7 +26,7 @@ appointment_workflow = AppointmentWorkflow()
 class SessionManager:
     def __init__(self):
         self.current_session: Dict[str, any] = None
-        self.timeout = 20  # seconds
+        self.timeout = 60  # seconds
         self.timeout_task: asyncio.Task = None
         self.transcript = []
         self.last_response = None
@@ -194,8 +194,7 @@ async def whatsapp_webhook(request: Request):
         full_response = (
             f"{'🆕 New session started!\n' if is_new_session else ''}"
             f"{ai_response}\n\n"
-            f"ℹ️ {session_manager.get_session_info()}\n"
-            "⏳ Session will timeout after 20 seconds of inactivity"
+            "⏳ Session will timeout after 60 seconds of inactivity"
         )
         
         # Store the last response
