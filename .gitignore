@@ -1,5 +1,5 @@
 venv/
-.env
+
 __pycache__/
 ngrok_recovery_codes.txt
 company_details.json

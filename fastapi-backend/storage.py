@@ -42,8 +42,8 @@ class CompanyDetailsStorage:
 class VectorStore:
     def __init__(self):
         self.embedding = OpenAIEmbeddings(model="text-embedding-3-large")
-        self.activeloop_org = "hrithikkoduri18"
-        self.activeloop_dataset = "ConvoPro_4"
+        self.activeloop_org = "<YOUR_ACTIVELOOP_ORG>"
+        self.activeloop_dataset = "<YOUR_ACTIVELOOP_DATASET>"
         self.dataset_path = f"hub://{self.activeloop_org}/{self.activeloop_dataset}"
         self.docs = [] 
         self.storage = CompanyDetailsStorage()
