@@ -153,10 +153,10 @@ Copy the https url provided by ngrok and go to the Twilio console.
 In the WhatsApp sandbox, go to the settings section and select the edit option for the sandbox number.
 
 Paste the https url in the whatsapp sandbox setting in thsi format:
->https://<ngrok-url>/text/whatsapp
+>https://your-ngrok-url/text/whatsapp
 
 In the Phone Number settings, find the active number and paste the https url in the webhook section in this format:
->https://<ngrok-url>/call/incoming-call
+>https://your-ngrok-url/call/incoming-call
 
 
 ### 4. Test the app
