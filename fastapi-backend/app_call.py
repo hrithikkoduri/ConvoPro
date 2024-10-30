@@ -40,7 +40,9 @@ SYSTEM_MESSAGE = f"""You are Donna, an AI receptionist for the company: {company
         - Politely engage with the client and answer their questions regarding the company and services.
         - If they want to book an appointment, obtain their name, availability, and service/work required. Ask one question at a time.
         Do not ask for other contact information, and do not check availability, assume we are free. Ensure the conversation remains friendly and professional, 
-        and guide the user to provide these details naturally. If necessary, ask follow-up questions to gather the required information."""
+        and guide the user to provide these details naturally. If necessary, ask follow-up questions to gather the required information.
+        While replying to user queries, make sure to provide as concise and to-the-point information as possible.
+        """
 
 print("--------#########--------")
 print(SYSTEM_MESSAGE)
@@ -257,6 +259,7 @@ async def media_stream(websocket: WebSocket):
         # You could add webhook functionality here to send the transcript
         # to your external system
         result = appointment_workflow.process_transcript_and_send_to_webhook(session["transcript"])
+        print(result)
 
 if __name__ == "__main__":
     import uvicorn

@@ -1,5 +1,5 @@
 from langchain_openai import ChatOpenAI
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from langchain_core.prompts import ChatPromptTemplate
 import os
 import requests
@@ -52,6 +52,8 @@ class AppointmentWorkflow:
         - the entire conversation transcript.
          
         Also based on today's date and day of the week provided, figure out the exact date and time for availability that user has mentioned in the transcript.
+        Note: The today's date is only for reference to figure out customer availability date, if the customer has not provided the date in the transcript then CustomerAvailability_date should be Unavailable.
+        Similarly, if the customer has not provided the time in the transcript then CustomerAvailability_time should be Unavailable.
         """
     
         customer_details_prompt = ChatPromptTemplate.from_messages([
@@ -82,10 +84,11 @@ class AppointmentWorkflow:
             print(f"Conversation Summary: {customer_details.conversationSummary}")
             print(f"Conversation Transcript: {customer_details.conversationTranscript}")
 
-            if not customer_details or customer_details.customerName == "User":
-                logger.warning("No valid meeting details found")
-                print("\nNo valid meeting details found in transcript")
-                return None
+            #appointment_decision  = self.check_appointment(self.transcript)
+            #if appointment_decision == "no":
+                #return "User didnt book an appointment or provided details to schedule an appointment"
+            
+            #else:
 
             # Convert pydantic model to dict, then to JSON string
             customer_dict = customer_details.model_dump()
@@ -122,7 +125,7 @@ class AppointmentWorkflow:
                     logger.info("Data sent to webhook (non-JSON response)")
 
                 print("\nAppointment scheduled successfully!")
-                return "Meeting scheduled successfully"
+                return "Transcript processed and data sent to webhook"
 
             except requests.exceptions.RequestException as e:
                 error_msg = f"Error sending data to webhook: {str(e)}"
@@ -135,7 +138,6 @@ class AppointmentWorkflow:
             logger.error(error_msg)
             print(f"\nError: {error_msg}")
             return None
-
 
 #for testing
 def main():
