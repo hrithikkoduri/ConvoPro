@@ -1,5 +1,19 @@
 # ConvoPro - Your way to faster and efficient AI customer service
 
+<div align="center">
+
+[![Python](https://img.shields.io/badge/Python-3.9%2B-blue?style=flat&logo=python)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115.2-009688?style=flat&logo=fastapi)](https://fastapi.tiangolo.com/)
+[![OpenAI](https://img.shields.io/badge/OpenAI-1.51.2-412991?style=flat&logo=openai)](https://openai.com/)
+[![Langchain](https://img.shields.io/badge/Langchain-0.3.2-2496ED?style=flat&logo=chainlink)](https://www.langchain.com/)
+[![Twilio](https://img.shields.io/badge/Twilio-9.3.6-F22F46?style=flat&logo=twilio)](https://www.twilio.com/)
+[![DeepLake](https://img.shields.io/badge/DeepLake-3.9.26-FF6B6B?style=flat&logo=activeloop)](https://www.activeloop.ai/)
+[![Make](https://img.shields.io/badge/Make.com-Automation-4285F4?style=flat&logo=make)](https://www.make.com/)
+[![Ngrok](https://img.shields.io/badge/Ngrok-3.5.0-1F1E37?style=flat&logo=ngrok)](https://ngrok.com/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+</div>
+
 ## Introduction
 **ConvoPro** is an innovative conversational platform designed to enhance communication and engagement through intelligent dialogue systems. With a focus on user-centric design, ConvoPro enables seamless interactions, making it ideal for businesses looking to improve customer service, automate responses, schedule appointments and facilitate meaningful conversations. 
 
@@ -38,6 +52,75 @@ The application is structured into several key components:
 - `storage.py` - Vector store and data persistence
 - `ai_output.py` - AI model integration
 - `appointment_call.py` - Appointment scheduling logic
+
+```mermaid
+    graph TB
+        subgraph Client
+            WA[WhatsApp Client]
+            VC[Voice Client]
+        end
+
+        subgraph FastAPI_Backend["FastAPI Backend"]
+            MA[Main App]
+            TC[Text Controller]
+            CC[Call Controller]
+            AW[Appointment Workflow]
+            VS[Vector Store]
+            AI[AI Output]
+            
+            MA --> TC
+            MA --> CC
+            TC --> AW
+            CC --> AW
+            TC --> VS
+            CC --> VS
+            TC --> AI
+            CC --> AI
+        end
+
+        subgraph External_Services
+            subgraph OpenAI
+                CM[Chat Model]
+                EM[Embeddings Model]
+                RT[Real-time API]
+            end
+            
+            TW[Twilio]
+            DL[DeepLake]
+            MK[Make.com]
+        end
+
+        subgraph Storage
+            VDB[(Vector Database)]
+            CD[(Company Details)]
+        end
+
+        %% Client to Backend connections
+        WA --> |WhatsApp Messages| TC
+        VC --> |Voice Calls| CC
+
+        %% Backend to External Services
+        TC --> |Text Processing| CM
+        CC --> |Voice Processing| RT
+        VS --> |Store Embeddings| DL
+        VS --> |Generate Embeddings| EM
+        AW --> |Schedule Appointment| MK
+        
+        %% Storage connections
+        VS --> VDB
+        TC --> CD
+        CC --> CD
+
+        %% External service connections
+        TW --> TC
+        TW --> CC
+        DL --> VDB
+
+        style FastAPI_Backend fill:#f5f5f5,stroke:#333,stroke-width:2px
+        style External_Services fill:#e6f3ff,stroke:#333,stroke-width:2px
+        style Storage fill:#f0fff0,stroke:#333,stroke-width:2px
+        style Client fill:#fff0f0,stroke:#333,stroke-width:2px
+```
 
 ## Technologies Used
 - Python 3.9+
