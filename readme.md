@@ -61,15 +61,23 @@ The application is structured into several key components:
         end
 
         subgraph FastAPI_Backend["FastAPI Backend"]
-            MA[Main App]
-            TC[Text Controller]
-            CC[Call Controller]
-            AW[Appointment Workflow]
-            VS[Vector Store]
-            AI[AI Output]
+            subgraph Controllers
+                MA[Main App]
+                TC[Text Controller]
+                CC[Call Controller]
+            end
             
+            subgraph Core_Services
+                AW[Appointment Workflow]
+                VS[Vector Store]
+                AI[AI Output]
+            end
+            
+            %% Controller connections
             MA --> TC
             MA --> CC
+            
+            %% Service connections
             TC --> AW
             CC --> AW
             TC --> VS
@@ -78,33 +86,43 @@ The application is structured into several key components:
             CC --> AI
         end
 
-        subgraph External_Services
-            subgraph OpenAI
+        subgraph External_Services["External Services"]
+            subgraph OpenAI["OpenAI Services"]
                 CM[Chat Model]
                 EM[Embeddings Model]
                 RT[Real-time API]
             end
             
-            TW[Twilio]
-            DL[DeepLake]
-            MK[Make.com]
+            subgraph Communication
+                TW[Twilio Service]
+            end
+            
+            subgraph Storage_Services
+                DL[DeepLake]
+            end
+            
+            subgraph Automation
+                MK[Make.com Workflow]
+            end
         end
 
-        subgraph Storage
+        subgraph Data_Storage["Data Storage"]
             VDB[(Vector Database)]
             CD[(Company Details)]
         end
 
         %% Client to Backend connections
-        WA --> |WhatsApp Messages| TC
-        VC --> |Voice Calls| CC
+        WA -->|WhatsApp Messages| TC
+        VC -->|Voice Calls| CC
 
-        %% Backend to External Services
-        TC --> |Text Processing| CM
-        CC --> |Voice Processing| RT
-        VS --> |Store Embeddings| DL
-        VS --> |Generate Embeddings| EM
-        AW --> |Schedule Appointment| MK
+        %% Backend to OpenAI
+        TC -->|Text Processing| CM
+        CC -->|Voice Processing| RT
+        VS -->|Generate Embeddings| EM
+        
+        %% Backend to Other Services
+        VS -->|Store Embeddings| DL
+        AW -->|Schedule Appointment| MK
         
         %% Storage connections
         VS --> VDB
@@ -116,10 +134,20 @@ The application is structured into several key components:
         TW --> CC
         DL --> VDB
 
-        style FastAPI_Backend fill:#f5f5f5,stroke:#333,stroke-width:2px
-        style External_Services fill:#e6f3ff,stroke:#333,stroke-width:2px
-        style Storage fill:#f0fff0,stroke:#333,stroke-width:2px
-        style Client fill:#fff0f0,stroke:#333,stroke-width:2px
+        %% Styling
+        classDef clientStyle fill:#ffe6e6,stroke:#333,stroke-width:2px
+        classDef backendStyle fill:#e6f3ff,stroke:#333,stroke-width:2px
+        classDef externalStyle fill:#f0fff0,stroke:#333,stroke-width:2px
+        classDef storageStyle fill:#fff0f5,stroke:#333,stroke-width:2px
+        classDef controllerStyle fill:#f5f5f5,stroke:#333,stroke-width:2px
+        classDef serviceStyle fill:#f0f8ff,stroke:#333,stroke-width:2px
+
+        class Client clientStyle
+        class FastAPI_Backend backendStyle
+        class External_Services externalStyle
+        class Data_Storage storageStyle
+        class Controllers controllerStyle
+        class Core_Services serviceStyle
 ```
 
 ## Technologies Used
